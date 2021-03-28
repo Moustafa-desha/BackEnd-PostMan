@@ -3,17 +3,17 @@
 namespace App\Http\Interfaces;
 
 
-interface StaffInterface{
+interface TeacherInterface{
 
-    public function addStaff($request);
+    public function addTeacher($request);
 
-    public function allStaff();
+    public function allTeachers();
 
-    public function specificStaff($request);
+    public function specificTeacher($request);
 
-    public function updateStaff($request);
+    public function updateTeacher($request);
 
-    public function deleteStaff($request);
+    public function deleteTeacher($request);
 
 
 }

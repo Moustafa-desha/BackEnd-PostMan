@@ -12,6 +12,18 @@ class User extends Authenticatable implements JWTSubject
 {
     use HasFactory, Notifiable;
 
+    public function roleName(){
+
+        return $this->belongsTo(Role::class,'role_id','id');
+    }
+
+
+    public function studentGroup(){
+        return $this->hasMany(studentGroup::class, 'student_id', 'id');
+    }
+
+
+
     // Rest omitted for brevity
 
     /**
@@ -57,6 +69,8 @@ class User extends Authenticatable implements JWTSubject
     protected $hidden = [
         'password',
         'remember_token',
+        'created_at',
+        'updated_at',
     ];
 
     /**

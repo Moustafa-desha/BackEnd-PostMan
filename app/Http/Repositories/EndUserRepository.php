@@ -3,153 +3,49 @@
 namespace App\Http\Repositories;
 
 
+use App\Http\Interfaces\EndUserInterface;
+use App\Models\Group;
 use App\Models\Role;
+use App\Models\StudentGroup;
 use App\Models\User;
-use App\Http\Interfaces\TeacherInterface;
 use App\Http\Traits\ApiDesignTrait;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 
 
-class TeacherRepository implements TeacherInterface {
+class EndUserRepository implements EndUserInterface {
 
     use ApiDesignTrait;
 
 
     private $userModel;
-    private $roleModel;
+    private $groupModel;
+    private $studentGroupModel;
 
-    public function __construct(User $user,Role $role)
+    public function __construct(User $user,Group $group, StudentGroup $studentGroup)
     {
         $this->userModel = $user;
-        $this ->roleModel = $role;
+        $this ->groupModel = $group;
+        $this->studentGroupModel = $studentGroup;
     }
 
-    public function addTeacher($request)
+
+    public function userGroups()
     {
-        $validation = Validator::make($request->all(),[
-            'name' => 'required|min:3|max:50',
-            'email' => 'required|email|unique:users',
-            'phone' => 'required',
-            'password' => 'required|min:8|max:50',
-            'role_id' => 'required|exists:roles,id',
-            ]);
+        $userId = auth()->user()->id;
+        $roleName = auth()->user()->roleName->name;
 
-        if ($validation->fails()) {
+        if($roleName == 'Teacher'){
+            return $this->groupModel::where('teacher_id',$userId)->withCount('groupStudents')->get();
 
-            return $this->ApiResponse(422,'validation Error',$validation->errors());
-        }
+        }elseif ($roleName == 'Student')
 
-        $this->userModel::create([
+           return $this->groupModel::whereHas('groupStudents',function ($query) use($userId){
+                $query->where([ ['student_id',$userId], ['count' ,'>=', 1] ]);
+            })->withCount('groupStudents')->get();
 
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => Hash::make($request->password),
-            'role_id' => $request->role_id,
-        ]);
-        return $this->ApiResponse(200,'teacher Was Created Successfully');
     }
-
-    public function allTeachers()
-    {
-        //دى طريقة شغاله لكن بترجع اراى جوة اراى  لان بدنا نجيب الداتا من الرول الاول وليس من اليوزر
-       // $staff = $this->roleModel::where('is_staff',1)->with('roleUser')->get();
-
-        //********second way and it work also********
-       /* $staff = $this->userModel::whereHas('roleName',function($query){
-            return $query->where('is_staff',1);
-        })->with('roleName')->get();*/
-
-        //therd way more dynamic
-        $is_teacher = 1;
-        $teacher = $this->userModel::whereHas('roleName',function($query) use($is_teacher){
-            return $query->where('is_teacher',$is_teacher);
-        })->with('roleName')->get();
-
-        return $this->ApiResponse(200,'done',null,$teacher);
-    }
-
-    public function updateTeacher($request)
-    {
-        $validation = Validator::make($request->all(),[
-
-            'name' => 'required',
-            'teacher_id' => 'required|exists:users,id',
-            //first way for check and it work
-            /*'email' => ['required',
-                 'email',
-                 Rule::unique('users')->ignore($request->teacher_id),
-                ],*/
-            'email' => 'required|email|unique:users,email,'.$request->teacher_id,
-            'phone' => 'required',
-            'password' => 'required|min:8|max:50',
-            'role_id' => 'required|exists:roles,id',
-        ]);
-
-        if ($validation->fails()){
-
-            return $this->ApiResponse(422,'validation Error',$validation->errors());
-        }
-
-        $teacher = $this->userModel::where('id',$request->teacher_id)->first();
-
-        $teacher->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => Hash::make($request->password),
-            'role_id' => $request->role_id,
-         ]);
-
-        return $this->ApiResponse(200 , 'teacher updated Successfully');
-    }
-
-    public function deleteTeacher($request)
-    {
-        $validation = Validator::make($request->all(),[
-            'teacher_id' => 'required|exists:users,id'
-        ]);
-
-        if($validation-> fails()){
-            return $this->ApiResponse(422,'validation error',$validation->fails() );
-        }
-
-        $teacher = $this->userModel::whereHas('roleName', function ($query){
-            return $query->where('is_teacher',1);
-        })->find($request->teacher_id);
-
-        if ($teacher){
-            $teacher->delete();
-            return $this->ApiResponse(200,'Teacher deleted successfully');
-        }
-
-            return $this->ApiResponse(422,'this user not teacher');
-    }
-
-
-    public function specificTeacher($request){
-
-        $validation = validator::make($request->all(),[
-            'teacher_id' => 'required|exists:users,id'
-        ]);
-            if($validation->fails()){
-                return $this->ApiResponse(200,'validation error',$validation->errors());
-            }
-            $teacher = $this->userModel::whereHas('roleName',function ($query){
-                return $query->where('is_teacher',1);
-            })->find($request->teacher_id);
-
-            if ($teacher){
-                return $this->ApiResponse(200,'done',null,$teacher);
-            }
-
-            return $this->ApiResponse(422,'not found');
-    }
-
-
 }
 
-?>
 

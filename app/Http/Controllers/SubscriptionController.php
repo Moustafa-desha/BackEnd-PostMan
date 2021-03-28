@@ -3,49 +3,31 @@
 namespace App\Http\Controllers;
 
 
-use App\Http\Interfaces\TeacherInterface;
-use Illuminate\Http\Request;
+use App\Http\Interfaces\SubscriptionInterface;
 
 
 
-class TeachersController extends Controller
+
+class SubscriptionController extends Controller
 {
-    private $teacherInterface;
+    private $subscriptionInterface;
     /**
-     * @var TeacherInterface
+     * @var SubscriptionInterface
      */
 
-    public function __construct(TeacherInterface $teacherInterface)
+    public function __construct(SubscriptionInterface $subscriptionInterface)
     {
-        $this->teacherInterface = $teacherInterface;
+        $this->subscriptionInterface = $subscriptionInterface;
     }
 
 
-    public function addTeacher(Request $request){
 
-        return $this->teacherInterface->addTeacher($request);
+    public function limitSub(){
+
+        return $this->subscriptionInterface->limitSub();
     }
+    public function ended(){
 
-    public function allTeachers(){
-
-        return $this->teacherInterface->allTeachers();
+        return $this->subscriptionInterface->ended();
     }
-
-    public function specificTeacher(Request $request){
-
-        return $this->teacherInterface->specificTeacher($request);
-    }
-
-    public function updateTeacher(Request $request){
-
-        return $this->teacherInterface->updateTeacher($request);
-    }
-
-
-    public function deleteTeacher(Request $request){
-
-        return $this->teacherInterface->deleteTeacher($request);
-    }
-
-
 }

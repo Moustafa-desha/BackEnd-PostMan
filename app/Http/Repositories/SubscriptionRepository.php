@@ -12,7 +12,7 @@ use App\Http\Traits\ApiDesignTrait;
 
 
 
-class SubscriptionIRepository implements SubscriptionInterface {
+class SubscriptionRepository implements SubscriptionInterface {
 
     use ApiDesignTrait;
 

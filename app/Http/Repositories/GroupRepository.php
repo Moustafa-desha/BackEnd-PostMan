@@ -3,38 +3,36 @@
 namespace App\Http\Repositories;
 
 
-use App\Models\Role;
-use App\Models\User;
-use App\Http\Interfaces\TeacherInterface;
+use App\Models\Group;
+use App\Http\Interfaces\GroupInterface;
 use App\Http\Traits\ApiDesignTrait;
 use http\Env\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 
 
-class TeacherRepository implements TeacherInterface {
+class GroupRepository implements GroupInterface {
 
     use ApiDesignTrait;
 
 
-    private $userModel;
-    private $roleModel;
+    private $groupModel;
 
-    public function __construct(User $user,Role $role)
+    public function __construct(Group $group)
     {
-        $this->userModel = $user;
-        $this ->roleModel = $role;
+        $this->groupModel = $group;
+
     }
 
-    public function addTeacher($request)
+    public function addGroup($request)
     {
         $validation = Validator::make($request->all(),[
             'name' => 'required|min:3|max:50',
-            'email' => 'required|email|unique:users',
-            'phone' => 'required',
-            'password' => 'required|min:8|max:50',
-            'role_id' => 'required|exists:roles,id',
+            'body' => 'required',
+            'image' => 'required', //|image|mimes:jpg,bmp,png,
+            'teacher_id' => 'required|exists:users,id',
             ]);
 
         if ($validation->fails()) {
@@ -42,51 +40,33 @@ class TeacherRepository implements TeacherInterface {
             return $this->ApiResponse(422,'validation Error',$validation->errors());
         }
 
-        $this->userModel::create([
+        $this->groupModel::create([
 
             'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => Hash::make($request->password),
-            'role_id' => $request->role_id,
+            'body' => $request->body,
+            'image' => $request->image,
+            'teacher_id' => $request->teacher_id,
+            'created_by' => Auth()->user()->id,
         ]);
-        return $this->ApiResponse(200,'teacher Was Created Successfully');
+        return $this->ApiResponse(200,'Group Was Created Successfully');
     }
 
-    public function allTeachers()
+    public function allGroups()
     {
-        //دى طريقة شغاله لكن بترجع اراى جوة اراى  لان بدنا نجيب الداتا من الرول الاول وليس من اليوزر
-       // $staff = $this->roleModel::where('is_staff',1)->with('roleUser')->get();
 
-        //********second way and it work also********
-       /* $staff = $this->userModel::whereHas('roleName',function($query){
-            return $query->where('is_staff',1);
-        })->with('roleName')->get();*/
+        $group = $this->groupModel::get();
 
-        //therd way more dynamic
-        $is_teacher = 1;
-        $teacher = $this->userModel::whereHas('roleName',function($query) use($is_teacher){
-            return $query->where('is_teacher',$is_teacher);
-        })->with('roleName')->get();
-
-        return $this->ApiResponse(200,'done',null,$teacher);
+        return $this->ApiResponse(200,'done',null,$group);
     }
 
-    public function updateTeacher($request)
+    public function updateGroup($request)
     {
         $validation = Validator::make($request->all(),[
 
-            'name' => 'required',
+            'name' => 'required|min:3|max:50',
+            'body' => 'required',
+            'image' => 'required', //|image|mimes:jpg,bmp,png,
             'teacher_id' => 'required|exists:users,id',
-            //first way for check and it work
-            /*'email' => ['required',
-                 'email',
-                 Rule::unique('users')->ignore($request->teacher_id),
-                ],*/
-            'email' => 'required|email|unique:users,email,'.$request->teacher_id,
-            'phone' => 'required',
-            'password' => 'required|min:8|max:50',
-            'role_id' => 'required|exists:roles,id',
         ]);
 
         if ($validation->fails()){
@@ -94,56 +74,54 @@ class TeacherRepository implements TeacherInterface {
             return $this->ApiResponse(422,'validation Error',$validation->errors());
         }
 
-        $teacher = $this->userModel::where('id',$request->teacher_id)->first();
+        $group = $this->groupModel::find($request->teacher_id);
 
-        $teacher->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => Hash::make($request->password),
-            'role_id' => $request->role_id,
-         ]);
+        if ($group){
 
-        return $this->ApiResponse(200 , 'teacher updated Successfully');
+            $group->update([
+                'name' => $request->name,
+                'body' => $request->body,
+                'image' => $request->image,
+                'teacher_id' => $request->teacher_id,
+             ]);
+        return $this->ApiResponse(200 , 'Group updated Successfully');
+        }
+        return $this->ApiResponse(404,'not found');
     }
 
-    public function deleteTeacher($request)
+    public function deleteGroup($request)
     {
         $validation = Validator::make($request->all(),[
-            'teacher_id' => 'required|exists:users,id'
+            'group_id' => 'required|exists:groups,id',
         ]);
 
         if($validation-> fails()){
             return $this->ApiResponse(422,'validation error',$validation->fails() );
         }
 
-        $teacher = $this->userModel::whereHas('roleName', function ($query){
-            return $query->where('is_teacher',1);
-        })->find($request->teacher_id);
+        $group = $this->groupModel::find($request->group_id);
 
-        if ($teacher){
-            $teacher->delete();
-            return $this->ApiResponse(200,'Teacher deleted successfully');
+        if ($group){
+            $group->delete();
+            return $this->ApiResponse(200,'Group deleted successfully');
         }
 
-            return $this->ApiResponse(422,'this user not teacher');
+            return $this->ApiResponse(422,'this is not found');
     }
 
 
-    public function specificTeacher($request){
+    public function specificGroup($request){
 
         $validation = validator::make($request->all(),[
-            'teacher_id' => 'required|exists:users,id'
+            'group_id' => 'required|exists:groups,id'
         ]);
             if($validation->fails()){
                 return $this->ApiResponse(200,'validation error',$validation->errors());
             }
-            $teacher = $this->userModel::whereHas('roleName',function ($query){
-                return $query->where('is_teacher',1);
-            })->find($request->teacher_id);
+            $group = $this->groupModel::find($request->group_id);
 
-            if ($teacher){
-                return $this->ApiResponse(200,'done',null,$teacher);
+            if ($group){
+                return $this->ApiResponse(200,'done',null,$group);
             }
 
             return $this->ApiResponse(422,'not found');
@@ -152,5 +130,5 @@ class TeacherRepository implements TeacherInterface {
 
 }
 
-?>
+
 

@@ -3,17 +3,9 @@
 namespace App\Http\Interfaces;
 
 
-interface TeacherInterface{
+interface SubscriptionInterface{
 
-    public function addTeacher($request);
+    public function limitSub();
 
-    public function allTeachers();
-
-    public function specificTeacher($request);
-
-    public function updateTeacher($request);
-
-    public function deleteTeacher($request);
-
-
+    public function ended();
 }

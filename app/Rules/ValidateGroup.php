@@ -20,12 +20,22 @@ class ValidateGroup implements Rule
      * Determine if the validation rule passes.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
+     * @param  mixed  $values
      * @return bool
      */
-    public function passes($attribute, $value)
+    public function passes($attribute, $values)
     {
-        //
+        /**
+         * pluck use to choose column in table direct
+         */
+        $GroupId = Group::pluck('id')->ToArray();
+        foreach ($values as $value)
+        {
+            if (! in_array($value[0],$GroupId))
+            {
+                return false;
+            }
+        }
     }
 
     /**
@@ -35,6 +45,6 @@ class ValidateGroup implements Rule
      */
     public function message()
     {
-        return 'The validation error message.';
+        return 'The Group Already Exists';
     }
 }

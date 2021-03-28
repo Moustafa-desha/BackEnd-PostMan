@@ -2,17 +2,17 @@
 
 namespace App\Http\Repositories;
 
+
 use App\Models\Role;
 use App\Models\User;
-use App\Http\Interfaces\StaffInterface;
+use App\Http\Interfaces\TeacherInterface;
 use App\Http\Traits\ApiDesignTrait;
-use http\Env\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
 
 
-class StaffRepository implements StaffInterface {
+
+class TeacherRepository implements TeacherInterface {
 
     use ApiDesignTrait;
 
@@ -26,7 +26,7 @@ class StaffRepository implements StaffInterface {
         $this ->roleModel = $role;
     }
 
-    public function addStaff($request)
+    public function addTeacher($request)
     {
         $validation = Validator::make($request->all(),[
             'name' => 'required|min:3|max:50',
@@ -49,10 +49,10 @@ class StaffRepository implements StaffInterface {
             'password' => Hash::make($request->password),
             'role_id' => $request->role_id,
         ]);
-        return $this->ApiResponse(200,'User Was Created Successfully');
+        return $this->ApiResponse(200,'teacher Was Created Successfully');
     }
 
-    public function allStaff()
+    public function allTeachers()
     {
         //دى طريقة شغاله لكن بترجع اراى جوة اراى  لان بدنا نجيب الداتا من الرول الاول وليس من اليوزر
        // $staff = $this->roleModel::where('is_staff',1)->with('roleUser')->get();
@@ -62,27 +62,27 @@ class StaffRepository implements StaffInterface {
             return $query->where('is_staff',1);
         })->with('roleName')->get();*/
 
-        //therd way
-        $is_staff = 1;
-        $staff = $this->userModel::whereHas('roleName',function($query) use($is_staff){
-            return $query->where('is_staff',$is_staff);
+        //therd way more dynamic
+        $is_teacher = 1;
+        $teacher = $this->userModel::whereHas('roleName',function($query) use($is_teacher){
+            return $query->where('is_teacher',$is_teacher);
         })->with('roleName')->get();
 
-        return $this->ApiResponse(200,'done',null,$staff);
+        return $this->ApiResponse(200,'done',null,$teacher);
     }
 
-    public function updateStaff($request)
+    public function updateTeacher($request)
     {
         $validation = Validator::make($request->all(),[
 
             'name' => 'required',
-            'staff_id' => 'required|exists:users,id',
+            'teacher_id' => 'required|exists:users,id',
             //first way for check and it work
             /*'email' => ['required',
                  'email',
-                 Rule::unique('users')->ignore($request->staff_id),
+                 Rule::unique('users')->ignore($request->teacher_id),
                 ],*/
-            'email' => 'required|email|unique:users,email,'.$request->staff_id,
+            'email' => 'required|email|unique:users,email,'.$request->teacher_id,
             'phone' => 'required',
             'password' => 'required|min:8|max:50',
             'role_id' => 'required|exists:roles,id',
@@ -93,9 +93,9 @@ class StaffRepository implements StaffInterface {
             return $this->ApiResponse(422,'validation Error',$validation->errors());
         }
 
-        $user = $this->userModel::where('id',$request->staff_id)->first();
+        $teacher = $this->userModel::where('id',$request->teacher_id)->first();
 
-        $user->update([
+        $teacher->update([
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
@@ -103,51 +103,53 @@ class StaffRepository implements StaffInterface {
             'role_id' => $request->role_id,
          ]);
 
-        return $this->ApiResponse(200 , 'User Edited Successfully');
+        return $this->ApiResponse(200 , 'teacher updated Successfully');
     }
 
-    public function deleteStaff($request)
+    public function deleteTeacher($request)
     {
         $validation = Validator::make($request->all(),[
-            'staff_id' => 'required|exists:users,id'
+            'teacher_id' => 'required|exists:users,id'
         ]);
 
         if($validation-> fails()){
             return $this->ApiResponse(422,'validation error',$validation->fails() );
         }
 
-        $staff = $this->userModel::whereHas('roleName', function ($query){
-            return $query->where('is_staff',1);
-        })->find($request->staff_id);
+        $teacher = $this->userModel::whereHas('roleName', function ($query){
+            return $query->where('is_teacher',1);
+        })->find($request->teacher_id);
 
-        if ($staff){
-            $staff->delete();
-            return $this->ApiResponse(200,'staff deleted successfully');
+        if ($teacher){
+            $teacher->delete();
+            return $this->ApiResponse(200,'Teacher deleted successfully');
         }
 
-            return $this->ApiResponse(422,'this user not staff');
+            return $this->ApiResponse(422,'this user not teacher');
     }
 
 
-    public function specificStaff($request){
+    public function specificTeacher($request){
 
         $validation = validator::make($request->all(),[
-            'staff_id' => 'required|exists:users,id'
+            'teacher_id' => 'required|exists:users,id'
         ]);
             if($validation->fails()){
-                return $this->ApiResponse(200,'validation erorr',$validation->errors());
+                return $this->ApiResponse(200,'validation error',$validation->errors());
             }
-            $staff = $this->userModel::whereHas('roleName',function ($staff_id){
-                return $staff_id->where('is_staff',1);
-            })->find($request->staff_id);
+            $teacher = $this->userModel::whereHas('roleName',function ($query){
+                return $query->where('is_teacher',1);
+            })->find($request->teacher_id);
 
-            if ($staff){
-                return $this->ApiResponse(200,'done',null,$staff);
+            if ($teacher){
+                return $this->ApiResponse(200,'done',null,$teacher);
             }
 
             return $this->ApiResponse(422,'not found');
     }
+
+
 }
 
-?>
+
 

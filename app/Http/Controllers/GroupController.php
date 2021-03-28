@@ -3,48 +3,48 @@
 namespace App\Http\Controllers;
 
 
-use App\Http\Interfaces\TeacherInterface;
+use App\Http\Interfaces\GroupInterface;
 use Illuminate\Http\Request;
 
 
 
-class TeachersController extends Controller
+class GroupController extends Controller
 {
-    private $teacherInterface;
+    private $groupInterface;
     /**
-     * @var TeacherInterface
+     * @var GroupInterface
      */
 
-    public function __construct(TeacherInterface $teacherInterface)
+    public function __construct(GroupInterface $groupInterface)
     {
-        $this->teacherInterface = $teacherInterface;
+        $this->groupInterface = $groupInterface;
     }
 
 
-    public function addTeacher(Request $request){
+    public function addGroup(Request $request){
 
-        return $this->teacherInterface->addTeacher($request);
+        return $this->groupInterface->addGroup($request);
     }
 
-    public function allTeachers(){
+    public function allGroups(){
 
-        return $this->teacherInterface->allTeachers();
+        return $this->groupInterface->allGroups();
     }
 
-    public function specificTeacher(Request $request){
+    public function specificGroup(Request $request){
 
-        return $this->teacherInterface->specificTeacher($request);
+        return $this->groupInterface->specificGroup($request);
     }
 
-    public function updateTeacher(Request $request){
+    public function updateGroup(Request $request){
 
-        return $this->teacherInterface->updateTeacher($request);
+        return $this->groupInterface->updateGroup($request);
     }
 
 
-    public function deleteTeacher(Request $request){
+    public function deleteGroup(Request $request){
 
-        return $this->teacherInterface->deleteTeacher($request);
+        return $this->groupInterface->deleteGroup($request);
     }
 
 

@@ -3,48 +3,48 @@
 namespace App\Http\Controllers;
 
 
-use App\Http\Interfaces\StaffInterface;
+use App\Http\Interfaces\TeacherInterface;
 use Illuminate\Http\Request;
 
 
 
-class StaffController extends Controller
+class TeachersController extends Controller
 {
-    private $staffInterface;
+    private $teacherInterface;
     /**
-     * @var StaffInterface
+     * @var TeacherInterface
      */
 
-    public function __construct(StaffInterface $staffInterface)
+    public function __construct(TeacherInterface $teacherInterface)
     {
-        $this->staffInterface = $staffInterface;
+        $this->teacherInterface = $teacherInterface;
     }
 
 
-    public function addStaff(Request $request){
+    public function addTeacher(Request $request){
 
-        return $this->staffInterface->addStaff($request);
+        return $this->teacherInterface->addTeacher($request);
     }
 
-    public function allStaff(){
+    public function allTeachers(){
 
-        return $this->staffInterface->allStaff();
+        return $this->teacherInterface->allTeachers();
     }
 
-    public function specificStaff(Request $request){
+    public function specificTeacher(Request $request){
 
-        return $this->staffInterface->specificStaff($request);
+        return $this->teacherInterface->specificTeacher($request);
     }
 
-    public function updateStaff(Request $request){
+    public function updateTeacher(Request $request){
 
-        return $this->staffInterface->updateStaff($request);
+        return $this->teacherInterface->updateTeacher($request);
     }
 
 
-    public function deleteStaff(Request $request){
+    public function deleteTeacher(Request $request){
 
-        return $this->staffInterface->deleteStaff($request);
+        return $this->teacherInterface->deleteTeacher($request);
     }
 
 

@@ -3,49 +3,35 @@
 namespace App\Http\Controllers;
 
 
-use App\Http\Interfaces\TeacherInterface;
+use App\Http\Interfaces\StudentInterface;
 use Illuminate\Http\Request;
 
 
 
-class TeachersController extends Controller
+class StudentController extends Controller
 {
-    private $teacherInterface;
+    private $studentInterface;
+
     /**
-     * @var TeacherInterface
+     * @var StudentInterface
      */
 
-    public function __construct(TeacherInterface $teacherInterface)
+    public function __construct(StudentInterface $studentInterface)
     {
-        $this->teacherInterface = $teacherInterface;
+       $this->studentInterface = $studentInterface;
     }
 
+    public function addStudent(Request $request){
 
-    public function addTeacher(Request $request){
-
-        return $this->teacherInterface->addTeacher($request);
+        return  $this->studentInterface->addStudent($request);
     }
 
-    public function allTeachers(){
+    public function allStudents(){
 
-        return $this->teacherInterface->allTeachers();
+        return  $this->studentInterface->allStudents();
     }
 
-    public function specificTeacher(Request $request){
-
-        return $this->teacherInterface->specificTeacher($request);
+    public function updateStudent(Request $request){
+        return $this->studentInterface->updateStudent($request);
     }
-
-    public function updateTeacher(Request $request){
-
-        return $this->teacherInterface->updateTeacher($request);
-    }
-
-
-    public function deleteTeacher(Request $request){
-
-        return $this->teacherInterface->deleteTeacher($request);
-    }
-
-
 }

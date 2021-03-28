@@ -3,49 +3,27 @@
 namespace App\Http\Controllers;
 
 
-use App\Http\Interfaces\TeacherInterface;
+use App\Http\Interfaces\EndUserInterface;
 use Illuminate\Http\Request;
 
 
 
-class TeachersController extends Controller
+class EndUserController extends Controller
 {
-    private $teacherInterface;
+    private $endUserInterface;
     /**
-     * @var TeacherInterface
+     * @var EndUserInterface
      */
 
-    public function __construct(TeacherInterface $teacherInterface)
+    public function __construct(EndUserInterface $endUserInterface)
     {
-        $this->teacherInterface = $teacherInterface;
+        $this->endUserInterface = $endUserInterface;
     }
 
 
-    public function addTeacher(Request $request){
-
-        return $this->teacherInterface->addTeacher($request);
-    }
-
-    public function allTeachers(){
-
-        return $this->teacherInterface->allTeachers();
-    }
-
-    public function specificTeacher(Request $request){
-
-        return $this->teacherInterface->specificTeacher($request);
-    }
-
-    public function updateTeacher(Request $request){
-
-        return $this->teacherInterface->updateTeacher($request);
-    }
-
-
-    public function deleteTeacher(Request $request){
-
-        return $this->teacherInterface->deleteTeacher($request);
-    }
-
+   public function userGroups()
+   {
+       return $this->endUserInterface->userGroups();
+   }
 
 }

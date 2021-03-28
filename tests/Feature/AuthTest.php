@@ -8,15 +8,14 @@ use Tests\TestCase;
 
 class AuthTest extends TestCase
 {
-    /**
-     * A basic feature test example.
-     *
-     * @return void
-     */
-    public function test_example()
+    public function testLoginWithAdminAccount()
     {
-        $response = $this->get('/');
-
-        $response->assertStatus(200);
+        $data = [
+            'email' => 'desha@test.com',
+            'password' => '123456789',
+        ];
+       $user = $this->json('post','/api/auth/login',$data);
+       $user->assertStatus(200);
+       $user->assertJson(['data' => ['role' => 'Admin']]);
     }
 }

@@ -3,13 +3,16 @@
 namespace App\Http\Middleware;
 
 
+use App\Http\Traits\ApiDesignTrait;
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use ApiResponse;
 
-class Teacher
+
+
+
+class Roles
 {
+    use ApiDesignTrait;
     /**
      * Handle an incoming request.
      *
@@ -17,13 +20,17 @@ class Teacher
      * @param  \Closure  $next
      * @return mixed
    /*  */
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next, $roles)
     {
+        $userRole = auth()->user()->roleName->name;
 
-       if(Auth::user()->role->name == 'Teacher'){
+//        here we will receive $roles and convert to array and compare between $userRole and $allowedUser
+        $allowUser = explode ('.',$roles);
+
+        if(!in_array($userRole , $allowUser)){
+            return $this->ApiResponse(422,' OOPS Not Allow for you not your Job');
+        }
         return $next($request);
-       }
-       return $this->ApiResponse(422 , 'Not Allow');
     }
 
 }

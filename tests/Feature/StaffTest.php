@@ -13,9 +13,9 @@ class StaffTest extends TestCase
      *
      * @return void
      */
-    public function test_example()
+    public function test_GetSaffData()
     {
-        $response = $this->get('/');
+        $response = $this->json('GET','/api/admin/all/staff');
 
         $response->assertStatus(200);
     }

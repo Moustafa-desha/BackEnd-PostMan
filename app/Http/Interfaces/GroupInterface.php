@@ -3,17 +3,17 @@
 namespace App\Http\Interfaces;
 
 
-interface TeacherInterface{
+interface GroupInterface{
 
-    public function addTeacher($request);
+    public function addGroup($request);
 
-    public function allTeachers();
+    public function allGroups();
 
-    public function specificTeacher($request);
+    public function specificGroup($request);
 
-    public function updateTeacher($request);
+    public function updateGroup($request);
 
-    public function deleteTeacher($request);
+    public function deleteGroup($request);
 
 
 }
